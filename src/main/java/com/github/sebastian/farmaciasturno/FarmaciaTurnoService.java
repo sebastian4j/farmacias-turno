@@ -15,9 +15,6 @@ import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 @Path("ws/")
 @RegisterRestClient
 public interface FarmaciaTurnoService {
-  /** la región que es requerida. */
-  public static final int REGION_PRUEBA = 7; 
-
   /**
    * obtengo las farmacias como texto, el servicio no responde application/json.
    * 

@@ -7,6 +7,7 @@ import java.nio.file.Paths;
 import java.util.stream.Collectors;
 
 /**
+ * lee el archivo con la respuesta del servicio externo.
  * 
  * @author Sebastián Ávila A.
  *

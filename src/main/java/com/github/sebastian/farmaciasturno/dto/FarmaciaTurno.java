@@ -3,7 +3,7 @@ package com.github.sebastian.farmaciasturno.dto;
 import javax.json.bind.annotation.JsonbProperty;
 
 /**
- * contiene los datos de una farmacia en turno obtenida por el servicio externo.
+ * contiene los datos de una farmacia en turno obtenida desde el servicio externo.
  * 
  * @author Sebastián Ávila A.
  *

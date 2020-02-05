@@ -20,16 +20,18 @@ import com.github.sebastian.farmaciasturno.utils.FarmaciasTurnoUtil;
  */
 @Path("/v1")
 public class FarmaciaTurnoResource {
+  /** la región que es requerida. */
+  private static final int REGION_PRUEBA = 7; 
   @Inject
   @RestClient
   private FarmaciaTurnoService fts;
 
   /**
-   * obtiene las farmacias en turno filtrando por comuna y local
+   * obtiene las farmacias en turno filtrando por comuna y local.
    * 
    * @param comuna nombre de la comuna para filtrar
    * @param local nombre del local para filtrar
-   * @return comunas que correspondan con el filtro o 204 si no hay contenido
+   * @return comunas que correspondan con el filtro (http 200) o http 204 si no hay contenido
    */
   @GET
   @Produces(MediaType.APPLICATION_JSON)
@@ -37,7 +39,7 @@ public class FarmaciaTurnoResource {
       @QueryParam("local") final String local) {
     Response response = Response.noContent().build();
     final var coincidencias = FarmaciasTurnoUtil
-        .filtrar(fts.obtenerFarmacias(FarmaciaTurnoService.REGION_PRUEBA), comuna, local);
+        .filtrar(fts.obtenerFarmacias(REGION_PRUEBA), comuna, local);
     if (!coincidencias.isEmpty()) {
       response = Response
           .ok(coincidencias.stream().map(FarmaciaTurnoResponse::new).collect(Collectors.toList()))

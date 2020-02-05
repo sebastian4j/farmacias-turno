@@ -1,10 +1,106 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Farmacias en Turno</title>    
-</head>
-<body>
-	<h1>Farmacias en Turno</h1>
-</body>
+    <head>
+        <meta charset="UTF-8">
+        <title>Farmacias en Turno</title>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">        
+        <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+        <script src="http://www.openlayers.org/api/OpenLayers.js"></script>
+        <style>
+            .mapa {
+                height: 300px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1 class="display-4">Farmacias en Turno</h1>
+            <form role="form">
+                <div class="form-group">
+                    <label for="comuna">Comuna: </label>
+                    <select class="form-control" id="comuna"></select>
+                    
+                </div>
+                <div class="form-group">
+                    <label for="local" class="cols-sm-4 col-form-label">Nombre de Local: </label>
+                    <input class="form-control" id="local">
+                </div>
+                <button type="button" class="btn btn-primary" id="buscar">Buscar</button>
+            </form>
+            <br>
+        <div id='salida' class="mapa text-center"></div>
+        <h5 id='coincidencias' class="mapa text-center"></h5>
+        </div>
+        
+        <script>
+            // select con las comunas
+            const fd  = new FormData();
+            fd.append('reg_id', '7');           
+            fetch('https://midastest.minsal.cl/farmacias/maps/index.php/utilidades/maps_obtener_comunas_por_regiones', {
+              method: 'POST',
+              body: fd
+            }).then(function(response) {
+                return response.text();
+            }).then(function(txt) {
+                $('#comuna').html(txt);
+            }).catch(error => console.log(error));
+            
+            $('#buscar').click(function(e) {
+                buscarCoincidencias();
+            });
+            
+            // limpiar la salida
+            const limpiarSalida = () => {
+                $('#salida').html('');
+                $('#coincidencias').html('');
+            }
+            
+            // obtener los datos que coinciden según el criterio de busqueda
+            const buscarCoincidencias = () => {
+                limpiarSalida();
+                let buscaComuna = '';
+                if ($('#comuna').val() > 0) {
+                    buscaComuna = $('#comuna option:selected').text();
+                }
+                const buscaLocal = $('#local').val();
+                
+                fetch(`v1?comuna=${buscaComuna}&local=${buscaLocal}`, {
+                  method: 'GET'
+                }).then(function(response) {
+                    if (response.status === 204) {
+                        $('#salida').html('Sin Coincidencias');
+                    } else if (response.status === 200) {
+                        return response.json();
+                    }
+                }).then(function(json) {
+                    dibujarCoincidencias(json);
+                }).catch(error => console.log(error));
+            }
+            
+            // dibujar los datos
+            const dibujarCoincidencias = (datos) => {
+                if (datos) {
+                    const map = new OpenLayers.Map("salida");
+                    map.addLayer(new OpenLayers.Layer.OSM());
+                    map.zoomToMaxExtent();
+                    const markers = new OpenLayers.Layer.Markers("Markers");
+                    map.addLayer(markers);
+                    console.log(datos);
+                    $('#coincidencias').html(`Coincidencias: ${datos.length}`);
+                    datos.forEach(dt => {
+                        var lonLat = new OpenLayers.LonLat(dt.longitud, dt.latitud)
+                        .transform(
+                         new OpenLayers.Projection("EPSG:4326"),
+                         map.getProjectionObject()
+                        );
+                        markers.addMarker(new OpenLayers.Marker(lonLat));
+                        var zoom=12;
+                        map.setCenter (lonLat, zoom);
+                    });
+                }
+            }
+        </script>
+    </body>
 </html>

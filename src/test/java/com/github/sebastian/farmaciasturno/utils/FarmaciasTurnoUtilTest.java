@@ -30,9 +30,7 @@ public class FarmaciasTurnoUtilTest {
     assertThat(FarmaciasTurnoUtil.filtrar(txt, "", "Ahumada").size()).isEqualTo(185);
     assertThat(FarmaciasTurnoUtil.filtrar(txt, "", "Cruz Verde").size()).isEqualTo(328);
     assertThat(FarmaciasTurnoUtil.filtrar(txt, "Cerrillos", "").size()).isEqualTo(14);
-    assertThat(FarmaciasTurnoUtil.filtrar(txt, "Macul", "").size()).isEqualTo(18);
-    
+    assertThat(FarmaciasTurnoUtil.filtrar(txt, "Macul", "").size()).isEqualTo(18); 
   }
-  
 
 }
